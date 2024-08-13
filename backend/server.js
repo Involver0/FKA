@@ -90,6 +90,16 @@ app.get('/businesses/:id', (req, res) => {
   }
 });
 
+app.use((err, req, res) => {
+  console.error(err.stack);
+
+  res.status(500).json({
+    error: {
+      message: 'Internal Server Error',
+    },
+  });
+});
+
 app.listen(3000, () => {
   console.log('Server running on port 3000');
 });
