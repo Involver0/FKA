@@ -42,7 +42,8 @@ const data = {
   bookings: [],
 };
 
-// Categories
+// CATEGORIES
+
 app.get('/categories', (req, res) => {
   res.json(data.categories).status(200);
 });
@@ -56,12 +57,46 @@ app.post('/categories', (req, res) => {
   res.status(201).json(newCategory);
 });
 
-// Businesses
+app.get('/categories/:id', (req, res) => {
+  const category = data.categories.find((c) => c.id == req.params.id);
+  if (category) {
+    res.json(category).status(200);
+  } else {
+    res.status(404).send('Category not found');
+  }
+});
+
+app.put('/categories/:id', (req, res) => {
+  const categoryIndex = data.categories.findIndex((c) => c.id == req.params.id);
+  if (categoryIndex !== -1) {
+    const updatedCategory = {
+      ...data.categories[categoryIndex],
+      ...req.body,
+    };
+    data.categories[categoryIndex] = updatedCategory;
+    res.json(updatedCategory).status(200);
+  } else {
+    res.status(404).send('Category not found');
+  }
+});
+
+app.delete('/categories/:id', (req, res) => {
+  const categoryIndex = data.categories.findIndex((c) => c.id == req.params.id);
+  if (categoryIndex !== -1) {
+    data.categories.splice(categoryIndex, 1);
+    res.status(204).send(); // No content
+  } else {
+    res.status(404).send('Category not found');
+  }
+});
+
+// END OF CATEGORIES
+
+// BUSINESSES
+
 app.get('/businesses', (req, res) => {
   res.json(data.businesses).status(200);
 });
-
-// additionl
 
 app.post('/businesses', (req, res) => {
   const newBusiness = {
@@ -70,15 +105,6 @@ app.post('/businesses', (req, res) => {
   };
   data.businesses.push(newBusiness);
   res.status(201).json(newBusiness);
-});
-
-// end of additional
-
-app.get('/businesses/category/:category', (req, res) => {
-  const filteredBusinesses = data.businesses.filter(
-    (b) => b.category.toLowerCase() === req.params.category.toLowerCase()
-  );
-  res.json(filteredBusinesses);
 });
 
 app.get('/businesses/:id', (req, res) => {
@@ -90,7 +116,41 @@ app.get('/businesses/:id', (req, res) => {
   }
 });
 
-app.use((err, req, res) => {
+app.put('/businesses/:id', (req, res) => {
+  const businessIndex = data.businesses.findIndex((b) => b.id == req.params.id);
+  if (businessIndex !== -1) {
+    const updatedBusiness = {
+      ...data.businesses[businessIndex],
+      ...req.body,
+    };
+    data.businesses[businessIndex] = updatedBusiness;
+    res.json(updatedBusiness).status(200);
+  } else {
+    res.status(404).send('Business not found');
+  }
+});
+
+app.delete('/businesses/:id', (req, res) => {
+  const businessIndex = data.businesses.findIndex((b) => b.id == req.params.id);
+  if (businessIndex !== -1) {
+    data.businesses.splice(businessIndex, 1);
+    res.status(204).send(); // No content
+  } else {
+    res.status(404).send('Business not found');
+  }
+});
+
+// END OF BUSINESSES
+
+app.get('/businesses/category/:category', (req, res) => {
+  const filteredBusinesses = data.businesses.filter(
+    (b) => b.category.toLowerCase() === req.params.category.toLowerCase()
+  );
+  res.json(filteredBusinesses);
+});
+
+app.use((err, req, res, next) => {
+  // Add 'next' as the fourth parameter
   console.error(err.stack);
 
   res.status(500).json({
